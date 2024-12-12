@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DP Kingstone</title>
+    <style>
+        /* General Styles */
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #1a1a1a;
+            color: #fff;
+            overflow-x: hidden;
+        }
+
+        .login-container {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: linear-gradient(to bottom, #002f6c, #8b0000);
+        }
+
+        .login-box {
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+        }
+
+        .login-box input {
+            display: block;
+            width: 100%;
+            margin: 10px 0;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        .login-box button {
+            background-color: #002f6c;
+            color: #fff;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .header, .footer {
+            width: 100%;
+            text-align: center;
+            color: white;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 20px;
+            background-color: #002f6c;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+        }
+
+        .header-title {
+            font-size: 24px;
+            font-weight: bold;
+            color: white;
+        }
+
+        .profile-box {
+            display: flex;
+            align-items: center;
+            background-color: white;
+            padding: 10px;
+            border-radius: 5px;
+        }
+
+        .profile-box img {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+
+        .profile-text {
+            color: black;
+        }
+
+        .profile-text .name {
+            font-weight: bold;
+        }
+
+        .footer {
+            padding: 10px;
+            background-color: black;
+            font-size: 14px;
+        }
+
+        .suspect-container {
+            padding: 20px;
+        }
+
+        .suspect-card {
+            width: 90%;
+            margin: 0 auto 20px;
+            padding: 20px;
+            background-color: #333;
+            color: white;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+            position: relative;
+        }
+
+        .suspect-card img {
+            width: 100%;
+            height: auto;
+            border-radius: 5px;
+        }
+
+        .suspect-actions {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+        }
+
+        .suspect-actions button {
+            padding: 10px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .mark-button {
+            background-color: green;
+            color: white;
+        }
+
+        .unmark-button {
+            background-color: orange;
+            color: white;
+        }
+
+        .discard-button {
+            background-color: red;
+            color: white;
+        }
+
+        .discard-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 0, 0, 0.5);
+            transform: rotate(-45deg);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-weight: bold;
+            font-size: 24px;
+        }
+
+        .marked-suspect {
+            border: 5px solid red;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="login-container">
+        <div class="login-box">
+            <h1>DP Kingstone</h1>
+            <input type="text" placeholder="Usuario" id="username">
+            <input type="password" placeholder="Contraseña" id="password">
+            <button onclick="login()">Iniciar sesión</button>
+        </div>
+    </div>
+
+    <div class="main-content" style="display:none;">
+        <header class="header">
+            <div class="header-title">DP Kingstone</div>
+            <div class="profile-box">
+                <img src="https://i.postimg.cc/MTytpddD/Foto-monse.jpg" alt="Profile Picture">
+                <div class="profile-text">
+                    <div class="name">Monse</div>
+                    <div>Abogada</div>
+                </div>
+            </div>
+        </header>
+
+        <div class="suspect-container">
+            <!-- Suspect 1 -->
+            <div class="suspect-card">
+                <img src="https://i.postimg.cc/x1hPGWZ5/a.png" alt="Sospechoso 1">
+                <div class="suspect-details">
+                    <p><strong>Nombre:</strong> Joel Palomera R.</p>
+                    <p><strong>Razones:</strong> Trabaja en el Corporativo</p>
+                </div>
+                <div class="suspect-actions">
+                    <button class="mark-button" onclick="markSuspect(this)">Marcar sospechoso principal</button>
+                    <button class="unmark-button" onclick="unmarkSuspect(this)">Desmarcar sospechoso</button>
+                    <button class="discard-button" onclick="discardSuspect(this)">Descartar sospechoso</button>
+                </div>
+            </div>
+
+            <!-- Suspect 2 -->
+            <div class="suspect-card">
+                <img src="https://i.postimg.cc/pLpZF2sy/b.png" alt="Sospechoso 2">
+                <div class="suspect-details">
+                    <p><strong>Nombre:</strong> Hector Fransisco G.</p>
+                    <p><strong>Razones:</strong> Contactos con redes conocidas.</p>
+                </div>
+                <div class="suspect-actions">
+                    <button class="mark-button" onclick="markSuspect(this)">Marcar sospechoso principal</button>
+                    <button class="unmark-button" onclick="unmarkSuspect(this)">Desmarcar sospechoso</button>
+                    <button class="discard-button" onclick="discardSuspect(this)">Descartar sospechoso</button>
+                </div>
+            </div>
+
+            <!-- Suspect 3 -->
+            <div class="suspect-card">
+                <img src="https://i.postimg.cc/qMBQpcns/c.png" alt="Sospechoso 3">
+                <div class="suspect-details">
+                    <p><strong>Nombre:</strong>Hector Paul L.</p>
+                    <p><strong>Razones:</strong> Relación cercana con la empresa</p>
+                </div>
+                <div class="suspect-actions">
+                    <button class="mark-button" onclick="markSuspect(this)">Marcar sospechoso principal</button>
+                    <button class="unmark-button" onclick="unmarkSuspect(this)">Desmarcar sospechoso</button>
+                    <button class="discard-button" onclick="discardSuspect(this)">Descartar sospechoso</button>
+                </div>
+            </div>
+
+            <!-- Suspect 4 -->
+            <div class="suspect-card">
+                <img src="https://i.postimg.cc/HndzcXNC/d.png" alt="Sospechoso 4">
+                <div class="suspect-details">
+                    <p><strong>Nombre:</strong> Fabricio Montoya P.</p>
+                    <p><strong>Razones:</strong> Camara de seguridad lo vio cerca</p>
+                </div>
+                <div class="suspect-actions">
+                    <button class="mark-button" onclick="markSuspect(this)">Marcar sospechoso principal</button>
+                    <button class="unmark-button" onclick="unmarkSuspect(this)">Desmarcar sospechoso</button>
+                    <button class="discard-button" onclick="discardSuspect(this)">Descartar sospechoso</button>
+                </div>
+            </div>
+
+ <!-- Suspect 5 -->
+            <div class="suspect-card">
+                <img src="https://i.postimg.cc/PJy4mNGv/e.png" alt="Sospechoso 5">
+                <div class="suspect-details">
+                    <p><strong>Nombre:</strong> Angelica G.</p>
+                    <p><strong>Razones:</strong> Testimonio incoherente</p>
+                </div>
+                <div class="suspect-actions">
+                    <button class="mark-button" onclick="markSuspect(this)">Marcar sospechoso principal</button>
+                    <button class="unmark-button" onclick="unmarkSuspect(this)">Desmarcar sospechoso</button>
+                    <button class="discard-button" onclick="discardSuspect(this)">Descartar sospechoso</button>
+                </div>
+            </div>
+
+            <!-- Suspect 6 -->
+            <div class="suspect-card">
+                <img src="https://i.postimg.cc/RCLXrp3C/f.png" alt="Sospechoso 6">
+                <div class="suspect-details">
+                    <p><strong>Nombre:</strong>Veronica A.</p>
+                    <p><strong>Razones:</strong> Trabajador de la empresa</p>
+                </div>
+                <div class="suspect-actions">
+                    <button class="mark-button" onclick="markSuspect(this)">Marcar sospechoso principal</button>
+                    <button class="unmark-button" onclick="unmarkSuspect(this)">Desmarcar sospechoso</button>
+                    <button class="discard-button" onclick="discardSuspect(this)">Descartar sospechoso</button>
+                </div>
+            </div>
+
+            <!-- Suspect 7 -->
+            <div class="suspect-card">
+                <img src="https://i.postimg.cc/bwBmCGZQ/g.png" alt="Sospechoso 7">
+                <div class="suspect-details">
+                    <p><strong>Nombre:</strong> Ricardo Alonso R.</p>
+                    <p><strong>Razones:</strong> Identificado por testigos en la zona.</p>
+                </div>
+                <div class="suspect-actions">
+                    <button class="mark-button" onclick="markSuspect(this)">Marcar sospechoso principal</button>
+                    <button class="unmark-button" onclick="unmarkSuspect(this)">Desmarcar sospechoso</button>
+                    <button class="discard-button" onclick="discardSuspect(this)">Descartar sospechoso</button>
+                </div>
+            </div>
+
+            <!-- Suspect 8 -->
+            <div class="suspect-card">
+                <img src="https://i.postimg.cc/d1M4Fzm3/h.png" alt="Sospechoso 8">
+                <div class="suspect-details">
+                    <p><strong>Nombre:</strong> Federico alfondo N.</p>
+                    <p><strong>Razones:</strong> Videos de segurid</p>
+                </div>
+                <div class="suspect-actions">
+                    <button class="mark-button" onclick="markSuspect(this)">Marcar sospechoso principal</button>
+                    <button class="unmark-button" onclick="unmarkSuspect(this)">Desmarcar sospechoso</button>
+                    <button class="discard-button" onclick="discardSuspect(this)">Descartar sospechoso</button>
+                </div>
+            </div>
+
+            <!-- Suspect 9 -->
+            <div class="suspect-card">
+                <img src="https://i.postimg.cc/XvBQTV5t/i.png" alt="Sospechoso 9">
+                <div class="suspect-details">
+                    <p><strong>Nombre:</strong> Paula M.</p>
+                    <p><strong>Razones:</strong> Graffitis con su firma encontrados en el lugar.</p>
+                </div>
+                <div class="suspect-actions">
+                    <button class="mark-button" onclick="markSuspect(this)">Marcar sospechoso principal</button>
+                    <button class="unmark-button" onclick="unmarkSuspect(this)">Desmarcar sospechoso</button>
+                    <button class="discard-button" onclick="discardSuspect(this)">Descartar sospechoso</button>
+                </div>
+            </div>
+
+            <!-- Suspect 10 -->
+            <div class="suspect-card">
+                <img src="https://i.postimg.cc/vHPhT1Lp/Captura-de-pantalla-2024-12-11-001550.png" alt="Sospechoso 10">
+                <div class="suspect-details">
+                    <p><strong>Nombre:</strong>Edwin Aldair D.</p>
+                    <p><strong>Razones:</strong> Transacciones sospechosas detectadas en cuentas offshore.</p>
+                </div>
+                <div class="suspect-actions">
+                    <button class="mark-button" onclick="markSuspect(this)">Marcar sospechoso principal</button>
+                    <button class="unmark-button" onclick="unmarkSuspect(this)">Desmarcar sospechoso</button>
+                    <button class="discard-button" onclick="discardSuspect(this)">Descartar sospechoso</button>
+                </div>
+            </div>
+        </div>
+
+        <footer class="footer">
+            Derechos reservados &copy; 2024 DP Kingstone | Codigo de Inversionistas principales: 222631268
+        </footer>
+    </div>
+    <script>
+        function login() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            if (username === 'Monse Bonita' && password === 'Alan mi patron') {
+                document.querySelector('.login-container').style.display = 'none';
+                document.querySelector('.main-content').style.display = 'block';
+            } else {
+                alert('Si usted no es miembro de la policía, por favor eliminar la aplicación');
+            }
+        }
+
+        function markSuspect(button) {
+            // Desmarcar otros
+            const allCards = document.querySelectorAll('.suspect-card');
+            allCards.forEach(card => card.classList.remove('marked-suspect'));
+
+            // Marcar el actual
+            const card = button.closest('.suspect-card');
+            card.classList.add('marked-suspect');
+        }
+
+        function unmarkSuspect(button) {
+            const card = button.closest('.suspect-card');
+            card.classList.remove('marked-suspect');
+        }
+
+        function discardSuspect(button) {
+            const card = button.closest('.suspect-card');
+            const overlay = document.createElement('div');
+            overlay.classList.add('discard-overlay');
+            overlay.textContent = 'DESCARTADO';
+            card.appendChild(overlay);
+        }
+    </script>
+
+</body>
+</html>
+
